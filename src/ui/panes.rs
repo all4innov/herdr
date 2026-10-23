@@ -518,7 +518,33 @@ pub(super) fn render_panes(
         }
     }
 
+    render_pane_gaps(app, pane_infos, frame);
     render_pane_borders(app, ws, pane_infos, split_borders, frame);
+}
+
+/// Fill the cells between panes that no pane covers when `pane_gap_bg` is set.
+fn render_pane_gaps(app: &AppState, pane_infos: &[PaneInfo], frame: &mut Frame) {
+    let bg = app.palette.pane_gap_bg;
+    if bg == Color::Reset || !app.pane_gaps || pane_infos.len() < 2 {
+        return;
+    }
+    let Some(bounds) = pane_infos
+        .iter()
+        .map(|info| info.rect)
+        .reduce(|a, b| a.union(b))
+    else {
+        return;
+    };
+    let buf = frame.buffer_mut();
+    let bounds = bounds.intersection(buf.area);
+    for y in bounds.top()..bounds.bottom() {
+        for x in bounds.left()..bounds.right() {
+            let pos = ratatui::layout::Position::new(x, y);
+            if !pane_infos.iter().any(|info| info.rect.contains(pos)) {
+                buf[(x, y)].set_bg(bg);
+            }
+        }
+    }
 }
 
 pub(crate) fn popup_pane_rects(app: &AppState, area: Rect) -> Option<(Rect, Rect)> {
@@ -1151,6 +1177,32 @@ mod tests {
         assert_eq!(right.rect, Rect::new(50, 0, 50, 20));
         assert!(left.borders.is_empty());
         assert!(right.borders.is_empty());
+    }
+
+    #[test]
+    fn pane_gap_bg_fills_only_cells_between_panes() {
+        let mut app = AppState::test_new();
+        app.pane_gaps = true;
+        app.palette.pane_gap_bg = Color::Rgb(1, 2, 3);
+        let mut workspace = Workspace::test_new("test");
+        workspace.test_split(ratatui::layout::Direction::Horizontal);
+        let infos = apply_pane_chrome(
+            workspace.tabs[0].layout.panes(Rect::new(0, 0, 100, 20)),
+            PaneBordersConfig::Off,
+            true,
+            true,
+        );
+        let mut terminal =
+            ratatui::Terminal::new(ratatui::backend::TestBackend::new(100, 20)).unwrap();
+
+        terminal
+            .draw(|frame| render_pane_gaps(&app, &infos, frame))
+            .unwrap();
+
+        let buffer = terminal.backend().buffer();
+        assert_eq!(buffer[(49, 5)].bg, Color::Rgb(1, 2, 3));
+        assert_eq!(buffer[(48, 5)].bg, Color::Reset);
+        assert_eq!(buffer[(50, 5)].bg, Color::Reset);
     }
 
     #[test]
