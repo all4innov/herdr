@@ -83,6 +83,12 @@
           "description": "Set the desktop sidebar background without changing other panel surfaces. Accepts hex, named colors, rgb(r,g,b), or reset aliases."
         },
         {
+          "key": "theme.custom.pane_gap_bg",
+          "type": "color",
+          "default": "unset",
+          "description": "Fill the cells between split panes when pane_gaps is enabled. Unset or reset keeps them transparent. Accepts hex, named colors, rgb(r,g,b), or reset aliases."
+        },
+        {
           "key": "theme.custom.active_row_bg",
           "type": "color",
           "default": "unset",
@@ -197,6 +203,12 @@
           "description": "Override the sidebar_bg color token when auto_switch selects a light appearance. Applied after theme.custom. Accepts hex, named colors, rgb(r,g,b), or reset aliases."
         },
         {
+          "key": "theme.custom.light.pane_gap_bg",
+          "type": "color",
+          "default": "unset",
+          "description": "Override the pane_gap_bg color token when auto_switch selects a light appearance. Applied after theme.custom. Accepts hex, named colors, rgb(r,g,b), or reset aliases."
+        },
+        {
           "key": "theme.custom.light.active_row_bg",
           "type": "color",
           "default": "unset",
@@ -309,6 +321,12 @@
           "type": "color",
           "default": "unset",
           "description": "Override the sidebar_bg color token when auto_switch selects a dark appearance. Applied after theme.custom. Accepts hex, named colors, rgb(r,g,b), or reset aliases."
+        },
+        {
+          "key": "theme.custom.dark.pane_gap_bg",
+          "type": "color",
+          "default": "unset",
+          "description": "Override the pane_gap_bg color token when auto_switch selects a dark appearance. Applied after theme.custom. Accepts hex, named colors, rgb(r,g,b), or reset aliases."
         },
         {
           "key": "theme.custom.dark.active_row_bg",
